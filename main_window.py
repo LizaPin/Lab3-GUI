@@ -4,7 +4,7 @@ QPushButton, QHBoxLayout, QMessageBox, QMenuBar, QAction, QMainWindow, QFileDial
 QDialog
 from PyQt5.QtGui import QIcon
 
-from util import splitting_x_y, date_search, splitting_week, splitting_year
+from util import splitting_x_y, date_search, splitting_week, splitting_year, create_annotation
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -26,8 +26,12 @@ class MainWindow(QMainWindow):
         file_menu = menubar.addMenu('Файл')
         self.file_action_open = QAction('Открыть', self)
         self.file_action_open.triggered.connect(self.on_file_open_click)
-
+        self.file_action_annotation = QAction('Создать аннотацию', self)
+        self.file_action_annotation.setEnabled(False)
+        self.file_action_annotation.triggered.connect(self.on_annotation_click)
+        
         file_menu.addAction(self.file_action_open)
+        file_menu.addAction(self.file_action_annotation)
 
         # Таблица будет белой
         self.table = QTableWidget()
@@ -110,6 +114,18 @@ class MainWindow(QMainWindow):
             self.table.setItem(i, 0, QTableWidgetItem(str(line.iloc[0])))
             self.table.setItem(i, 1, QTableWidgetItem(str(line.iloc[1])))
             i += 1
+        
+        self.file_action_annotation.setEnabled(True)
+    
+    def on_annotation_click(self):
+        result_folder = QFileDialog.getExistingDirectory(self, caption='Выберите папку для файла аннотации')
+        if result_folder == "":
+            QMessageBox.information(self, "Ошибка!", "Вы не выбрали папку")
+            return
+        if create_annotation.create_annotation(filename=self.datasetpaths[0], result_folder=result_folder):
+            QMessageBox.information(self, "Успех", "Файл создан")
+        else:
+            QMessageBox.information(self, "Ошибка!", "Что-то пошло не так!")
 
     def date_search(self):
         selected_date = self.open_calendar()
