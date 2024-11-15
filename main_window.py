@@ -26,10 +26,17 @@ class MainWindow(QMainWindow):
         file_menu = menubar.addMenu('Файл')
         self.file_action_open = QAction('Открыть', self)
         self.file_action_open.triggered.connect(self.on_file_open_click)
+       
+       # Панель инструментов с кнопкой "Создать аннотацию"
+        self.toolbar = self.addToolBar("Toolbar")
+        self.toolbar.setStyleSheet("background-color: #8A2BE2;")
+        
         self.file_action_annotation = QAction('Создать аннотацию', self)
         self.file_action_annotation.setEnabled(False)
+        self.file_action_annotation.setVisible(False)
         self.file_action_annotation.triggered.connect(self.on_annotation_click)
-        
+        self.toolbar.addAction(self.file_action_annotation)
+       
         file_menu.addAction(self.file_action_open)
         file_menu.addAction(self.file_action_annotation)
 
@@ -116,7 +123,8 @@ class MainWindow(QMainWindow):
             i += 1
         
         self.file_action_annotation.setEnabled(True)
-    
+        self.file_action_annotation.setVisible(True)
+        
     def on_annotation_click(self):
         result_folder = QFileDialog.getExistingDirectory(self, caption='Выберите папку для файла аннотации')
         if result_folder == "":
